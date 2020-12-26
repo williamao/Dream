@@ -50,7 +50,6 @@
 	import uniSearchBar from '../../components/uni-search-bar/uni-search-bar.vue'
 	import mSearch from '../../components/mehaotian-search-revision/mehaotian-search-revision.vue';
 	export default {
-
 		data() {
 			return {
 				result: '',
@@ -65,7 +64,6 @@
 			}
 		},
 		onReady() {
-
 		},
 		components: {
 			uniEcCanvas,
@@ -81,9 +79,7 @@
 				fail: err => {
 					console.error('调用失败：', err);
 				},
-
 			});
-
 		},
 		methods: {
 			init(openid) {
@@ -110,7 +106,6 @@
 					});
 				})
 			},
-
 			onClick(title) {
 				uni.setNavigationBarTitle({
 					title: title
@@ -124,7 +119,6 @@
 					fail: () => {},
 					complete: () => {}
 				});
-
 			},
 		}
 	}
@@ -137,7 +131,6 @@
 		align-items: center;
 		justify-content: center;
 	}
-
 	.logo {
 		height: 200rpx;
 		width: 200rpx;
@@ -146,17 +139,14 @@
 		margin-right: auto;
 		margin-bottom: 50rpx;
 	}
-
 	.uni-ec-canvas {
 		width: 750upx;
 		height: 750upx;
 		display: block;
 	}
-
 	view {
 		display: block;
 	}
-
 	.search-box {
 		width: 100%;
 		background-color: rgb(242, 242, 242);
@@ -166,11 +156,9 @@
 		position: sticky;
 		top: 0;
 	}
-
 	.search-box .mSearch-input-box {
 		width: 100%;
 	}
-
 	.search-box .input-box {
 		width: 95%;
 		flex-shrink: 1;
@@ -178,7 +166,6 @@
 		justify-content: center;
 		align-items: center;
 	}
-
 	.search-box .search-btn {
 		width: 15%;
 		margin: 0 0 0 2%;
@@ -191,7 +178,6 @@
 		background: linear-gradient(to right, #ff9801, #ff570a);
 		border-radius: 60upx;
 	}
-
 	.search-box .input-box>input {
 		width: 100%;
 		height: 60upx;
@@ -205,17 +191,14 @@
 		margin: 0;
 		background-color: #ffffff;
 	}
-
 	.placeholder-class {
 		text-align: center;
 		color: #9e9e9e;
 	}
-
 	.search-keyword {
 		width: 100%;
 		background-color: rgb(242, 242, 242);
 	}
-
 	.content-box {
 		flex: 1;
 		height: 44px;
@@ -227,7 +210,6 @@
 		border-bottom-width: 1px;
 		border-bottom-style: solid;
 	}
-
 	.content-text {
 		font-size: 15px;
 	}

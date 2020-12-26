@@ -2,7 +2,26 @@
 	<view>
 		<uni-ec-canvas class="uni-ec-canvas" id="line-chart" canvas-id="multi-charts-line" :ec="ec"></uni-ec-canvas>
 
-		今日预估净值: {{YGJJ}}
+		<view class="content">
+			<text v-if="YGJJ-DWJZ>=0" style="color:#ff0000;">今日预估净值: {{YGJJ}} （{{predValuePrecent}}% ↑）
+
+				<div class="content">
+					估算涨幅:{{(YGJJ-DWJZ).toFixed(4)}}
+				</div>
+			</text>
+			<text v-if="YGJJ-DWJZ<0" style="color:#090;">今日预估净值: {{YGJJ}} （ {{predValuePrecent}}% ↓）
+
+				<div class="content">
+					估算跌幅:{{(YGJJ-DWJZ).toFixed(4)}}
+				</div>
+			</text>
+
+			<view class="content">
+
+				<text> 根据统计预估买入金额: {{payMoney}}</text>
+			</view>
+		</view>
+
 		<view class="content">
 			<navigator :url="'../fundPredictPage/fundPredictPage?fundCode='+ encodeURIComponent(fundCode)" open-type="navigate"
 			 class="uploader-text"><text style="color: #007AFF;">基金涨幅预览</text></navigator>
@@ -15,7 +34,7 @@
 				</template>
 			</uni-list>
 		</view>
-		<view class="content">
+		<view class="content_data">
 			<text class="content">平均净值收益率</text>
 
 			<uni-list>
@@ -29,10 +48,7 @@
 
 			<text>收益率统计: {{sumV}}</text>
 		</view>
-		<view class="content">
 
-			<text> 根据统计预估买入金额: {{payMoney}}</text>
-		</view>
 	</view>
 </template>
 
@@ -51,6 +67,9 @@
 				sumV: '',
 				payMoney: 0,
 				YGJJ: 0,
+				DWJZ: 0,
+				predValuePrecent: 0
+
 			}
 		},
 		onReady() {},
@@ -62,11 +81,10 @@
 			this.getPredict();
 			this.init();
 		},
-		mounted() {
-		},
+		mounted() {},
 		methods: {
 			init() {
-				let sltTimeRange = '5n'
+				let sltTimeRange = '3n'
 				let urls =
 					`https://fundmobapi.eastmoney.com/FundMApi/FundNetDiagram.ashx?FCODE=${
 				          this.fundCode
@@ -142,7 +160,7 @@
 				});
 
 
-				
+
 				let value = this.YGJJ;
 
 				let sanYtn = ((parseFloat(value) - parseFloat(san)) / parseFloat(value)) * 100
@@ -322,8 +340,10 @@
 					success: (res) => {
 						let dataList = res.data.Datas.map((item) => item.split(","));
 						// console.log(dataList)
-						let predValue=dataList[dataList.length-1]
-						this.YGJJ =(res.data.Expansion.DWJZ * (1 + 0.01 * predValue[2])).toFixed(4)
+						let predValue = dataList[dataList.length - 1];
+						this.predValuePrecent = parseFloat(predValue[2]).toFixed(2);
+						this.DWJZ = res.data.Expansion.DWJZ;
+						this.YGJJ = (this.DWJZ * (1 + 0.01 * predValue[2])).toFixed(4)
 					}
 				});
 			},
@@ -345,10 +365,10 @@
 		justify-content: center;
 		padding-bottom: 10px;
 	}
-	.content_data{
+
+	.content_data {
 		display: flex;
 		flex-direction: column;
 		padding-bottom: 10px;
 	}
-	
 </style>
