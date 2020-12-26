@@ -3,45 +3,44 @@
 
 	<view>
 		<view class="search-box">
-			<!-- mSearch组件 如果使用原样式，删除组件元素-->
-			<!-- <mSearch class="mSearch-input-box" :mode="2" button="inside" :placeholder="defaultKeyword" @search="doSearch(false)" @input="inputChange" @confirm="doSearch(false)" v-model="keyword"></mSearch> -->
-			<!-- 原样式 如果使用原样式，恢复下方注销代码 -->
-
 			<view class="input-box">
 				<input type="text" :adjust-position="true" @focus="inputChange" placeholder="添加基金" placeholder-class="placeholder-class"
 				 confirm-type="search">
 			</view>
-			<!-- <view class="search-btn" @tap="inputChange">搜索</view> -->
 
-			<!-- 原样式 end -->
 		</view>
 
 		<div class="content">
 			<image class="logo" src="/static/b.jpg"></image>
-			<!-- <uni-ec-canvas class="uni-ec-canvas" id="line-chart" ref="canvas" canvas-id="lazy-load-chart" :ec="ec"></uni-ec-canvas> -->
 		</div>
 		<!-- 新建云函数 -->
-<!-- 		<view class="uploader">
+		<!-- 		<view class="uploader">
 			<navigator url="../demo/addFunction/addFunction" open-type="navigate" class="uploader-text"><text>测试SUM</text></navigator>
 		</view> -->
-		
-		<div class="content" v-if="listMyData.length>0">
-			<input class="uni-input" type="digit" @input="onKeyInput" placeholder="临时输入估算净值" />
-		</div>
-
 
 		<div class="content" v-if="listMyData.length<=0">
 			<button type="default" @click="inputChange">请先添加基金</button>
 		</div>
 		<div v-else>
-			<uni-list>
+
+			<uni-swipe-action>
 				<template v-for="(item,index) in listMyData">
-					<uni-list-item :title="item.fundName" :to="`../fund/fundCalcPage/fundCalcPage?fundCode=`+item.fundCode+`&value=`+ encodeURIComponent(inputValue)"
-					 rightText="详情" @click="onClick(item.fundName)" />
+
+
+					<uni-swipe-action-item :right-options="options" @click="swipBindClick(item)">
+						<view class="content-box">
+							<navigator :url="`../fund/fundCalcPage/fundCalcPage?fundCode=`+item.fundCode" open-type="navigate">
+								<text class="content-text" @click="onClick(item.fundName)">{{item.fundName }}</text>
+							</navigator>
+						</view>
+
+					</uni-swipe-action-item>
+
 				</template>
-			</uni-list>
+
+			</uni-swipe-action>
 		</div>
-			
+
 	</view>
 
 </template>
@@ -54,9 +53,15 @@
 
 		data() {
 			return {
-				inputValue: 3.0000,
 				result: '',
-				listMyData: 1
+				listMyData: [],
+				listMyData: [],
+				options: [{
+					text: '删除',
+					style: {
+						backgroundColor: '#dd524d'
+					}
+				}]
 			}
 		},
 		onReady() {
@@ -71,54 +76,45 @@
 			wx.cloud.callFunction({
 				name: 'login',
 				success: res => {
-					const db = wx.cloud.database() //初始化数据库
-					db.collection('fundData').where({
-						_openid: res.result.openid
-					}).get({
-						success: (res) => {
-							this.listMyData = res.data;
-						}
-					})
+					this.init(res.result.openid);
 				},
 				fail: err => {
 					console.error('调用失败：', err);
-				}
+				},
+
 			});
 
 		},
 		methods: {
+			init(openid) {
+				const db = wx.cloud.database() //初始化数据库
+				db.collection('fundData').where({
+					_openid: openid
+				}).get({
+					success: (res) => {
+						this.listMyData = res.data;
+					}
+				});
+			},
+			swipBindClick(e) {
+				var that = this;
+				console.log(e)
+				const db = wx.cloud.database() //初始化数据库
+				db.collection('fundData').doc(e._id).remove().then(res => {
+					uni.showToast({
+						title: "删除成功！",
+						duration: 2000
+					});
+					uni.reLaunch({
+						url: 'index'
+					});
+				})
+			},
+
 			onClick(title) {
-				// console.log('执行click事件', e)
 				uni.setNavigationBarTitle({
 					title: title
 				});
-				const db = wx.cloud.database() //初始化数据库	
-				const _ = db.command
-				db.collection('fund').where(_.or([{
-						F_NAME: db.RegExp({
-							regexp: '.*' + this.inputValue + '.*',
-							option: 'i'
-						})
-					},
-					{
-						F_CODE: db.RegExp({
-							regexp: '.*' + this.inputValue + '.*',
-							option: 'i'
-						})
-					},
-				])).get({
-					success: function(res) {
-						console.log(res.data)
-					}
-				})
-			},
-			onKeyInput: function(event) {
-				this.inputValue = event.target.value
-				console.log(this.inputValue)
-			},
-			search: function(event) {
-
-				console.log(event)
 			},
 			inputChange: function(event) {
 				console.log(event)
@@ -218,5 +214,21 @@
 	.search-keyword {
 		width: 100%;
 		background-color: rgb(242, 242, 242);
+	}
+
+	.content-box {
+		flex: 1;
+		height: 44px;
+		line-height: 44px;
+		padding: 0 15px;
+		position: relative;
+		background-color: #fff;
+		border-bottom-color: #f5f5f5;
+		border-bottom-width: 1px;
+		border-bottom-style: solid;
+	}
+
+	.content-text {
+		font-size: 15px;
 	}
 </style>

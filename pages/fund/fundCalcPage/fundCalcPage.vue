@@ -2,34 +2,36 @@
 	<view>
 		<uni-ec-canvas class="uni-ec-canvas" id="line-chart" canvas-id="multi-charts-line" :ec="ec"></uni-ec-canvas>
 
+		今日预估净值: {{YGJJ}}
 		<view class="content">
-			<navigator :url="'../fund/fundPredictPage/fundPredictPage?fundCode='+ encodeURIComponent(fundCode)" open-type="navigate" class="uploader-text"><text style="color: #007AFF;">基金预览</text></navigator>
+			<navigator :url="'../fundPredictPage/fundPredictPage?fundCode='+ encodeURIComponent(fundCode)" open-type="navigate"
+			 class="uploader-text"><text style="color: #007AFF;">基金涨幅预览</text></navigator>
+		</view>
+		<view class="content_data">
+			<text class="content">单位净值平均值</text>
+			<uni-list>
+				<template v-for="(item,index) in listData">
+					<uni-list-item :title="item.title" :rightText="item.rightText"></uni-list-item>
+				</template>
+			</uni-list>
 		</view>
 		<view class="content">
-		<text class="content">单位净值22平均值</text>
-		<uni-list>
-			<template v-for="(item,index) in listData">
-				<uni-list-item :title="item.title" :rightText="item.rightText"></uni-list-item>
-			</template>
-		</uni-list>
-		</view>
-		<view class="content">
-		<text class="content">平均净值收益率</text>
+			<text class="content">平均净值收益率</text>
 
-		<uni-list>
-			<template v-for="(item,index) in listDataYtn">
-				<uni-list-item :title="item.title" :rightText="item.rightText"></uni-list-item>
-			</template>
-		</uni-list>
+			<uni-list>
+				<template v-for="(item,index) in listDataYtn">
+					<uni-list-item :title="item.title" :rightText="item.rightText"></uni-list-item>
+				</template>
+			</uni-list>
 
 		</view>
 		<view class="content">
-			
-		<text >收益率统计: {{sumV}}</text>
+
+			<text>收益率统计: {{sumV}}</text>
 		</view>
 		<view class="content">
-			
-		<text > 根据统计预估买入金额: {{payMoney}}</text>
+
+			<text> 根据统计预估买入金额: {{payMoney}}</text>
 		</view>
 	</view>
 </template>
@@ -48,7 +50,7 @@
 				listDataYtn: [],
 				sumV: '',
 				payMoney: 0,
-				value: 1,
+				YGJJ: 0,
 			}
 		},
 		onReady() {},
@@ -56,12 +58,11 @@
 			uniEcCanvas
 		},
 		onLoad: function(option) {
-			console.log(option); //打印出上个页面传递的参数。
 			this.fundCode = option.fundCode;
-			this.value=option.value;
+			this.getPredict();
+			this.init();
 		},
 		mounted() {
-			this.init();
 		},
 		methods: {
 			init() {
@@ -141,8 +142,8 @@
 				});
 
 
-
-				let value = parseFloat(this.value);
+				
+				let value = this.YGJJ;
 
 				let sanYtn = ((parseFloat(value) - parseFloat(san)) / parseFloat(value)) * 100
 				let liuYtn = ((parseFloat(value) - parseFloat(liu)) / parseFloat(value)) * 100
@@ -194,10 +195,10 @@
 
 				let sum = (sanYtn + liuYtn + jiuYtn + yibaibaYtn + sanbailiuYtn + sanliujiuYtn + sanliuqiu180Ytn +
 					sanliuqiu180365Ytn + allYtn);
-				this.sumV = sum.toFixed(2)+ '%';
-				
-				this.payMoney=this.getMoney(sum/100);
-				
+				this.sumV = sum.toFixed(2) + '%';
+
+				this.payMoney = this.getMoney(sum / 100);
+
 				let chartTypeList = {
 					DWJZ: {
 						name: "单位净值",
@@ -228,7 +229,7 @@
 						data: dataList.map((item) => item.FSRQ),
 						axisLabel: {},
 					},
-						
+
 					yAxis: {
 						type: "value",
 						scale: true,
@@ -286,7 +287,7 @@
 				return (avg / dataList.length).toFixed(4);
 			},
 			getMoney(sumV) {
-				let Money=100;
+				let Money = 100;
 				if (sumV < -2) {
 					return Money * 10;
 				} else if (sumV < -1.5) {
@@ -310,7 +311,22 @@
 				} else {
 					return Money * 0;
 				}
-			}
+			},
+			getPredict() {
+				let url =
+					`https://fundmobapi.eastmoney.com/FundMApi/FundVarietieValuationDetail.ashx?FCODE=${
+				        this.fundCode
+				      }&deviceid=Wap&plat=Wap&product=EFund&version=2.0.0&_=${new Date().getTime()}`;
+				uni.request({
+					url: url,
+					success: (res) => {
+						let dataList = res.data.Datas.map((item) => item.split(","));
+						// console.log(dataList)
+						let predValue=dataList[dataList.length-1]
+						this.YGJJ =(res.data.Expansion.DWJZ * (1 + 0.01 * predValue[2])).toFixed(4)
+					}
+				});
+			},
 		},
 	}
 </script>
@@ -329,4 +345,10 @@
 		justify-content: center;
 		padding-bottom: 10px;
 	}
+	.content_data{
+		display: flex;
+		flex-direction: column;
+		padding-bottom: 10px;
+	}
+	
 </style>

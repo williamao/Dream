@@ -124,7 +124,7 @@
 				uni.request({
 					url: 'https://fundsuggest.eastmoney.com/FundSearch/api/FundSearchAPI.ashx?&m=9&key=' + keyword, //仅为示例
 					success: (res) => {
-						console.log(res)
+						// console.log(res)
 						this.keywordList = [];
 						this.keywordList = this.drawCorrelativeKeyword(res.data.Datas, keyword);
 						
@@ -191,14 +191,7 @@
 				        	title: "添加成功！",
 				        	duration: 2000
 				        });
-						
-						uni.redirectTo({
-							url: '../../index/index',
-							success: res => {},
-							fail: () => {},
-							complete: () => {}
-						});
-				        // console.log('[数据库] [新增记录] 成功，记录 _id: ', res._id)
+						uni.redirectTo({url: '../../index/index'});
 				      },
 				      fail: err => {
 						  uni.showToast({

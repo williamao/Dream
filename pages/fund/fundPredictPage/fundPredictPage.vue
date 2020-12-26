@@ -289,9 +289,10 @@
 				uni.request({
 					url: url,
 					success: (res) => {
-						console.log(res.data)
+						
 						this.ec.option = this.getOptiont(res.data.Datas);
 						let dataList = res.data.Datas.map((item) => item.split(","));
+						// console.log(dataList)
 						this.ec.option.series[0].data = dataList.map((item) =>
 							(+item[2]).toFixed(2)
 						);
