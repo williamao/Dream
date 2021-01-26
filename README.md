@@ -16,7 +16,7 @@
 
  ![扫码体验](https://raw.githubusercontent.com/williamao/Dream/main/pages/image.png)
  
- ![小白投微信群](https://raw.githubusercontent.com/williamao/Dream/main/pages/image.png)
+ ![小白投微信群](https://raw.githubusercontent.com/williamao/Dream/main/static/image.png)
  
  ![示例](https://raw.githubusercontent.com/williamao/Dream/main/image.png)
  
